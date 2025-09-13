@@ -1,0 +1,1632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RecipeHub - Discover, Cook & Share Amazing Recipes</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Fix text overlapping issues in homepage */
+        .hero-slider {
+            position: relative;
+            height: 70vh;
+            min-height: 500px;
+            overflow: hidden;
+        }
+        
+        .hero-slides {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .hero-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px 20px;
+            box-sizing: border-box;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        
+        .hero-slide.active {
+            opacity: 1;
+        }
+        
+        .hero-background-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1;
+        }
+        
+        .hero-slide-content {
+            max-width: 800px;
+            width: 100%;
+            z-index: 2;
+            position: relative;
+        }
+        
+        .hero-controls {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 3;
+            pointer-events: none;
+        }
+        
+        .hero-prev, .hero-next {
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid var(--primary-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            pointer-events: all;
+        }
+        
+        .hero-prev:hover, .hero-next:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .hero-dots {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 3;
+        }
+        
+        .hero-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2px solid white;
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .hero-dot.active {
+            background: white;
+        }
+        
+        .hero-slide h2 {
+            font-size: clamp(2rem, 4vw, 3.5rem);
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 20px;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            word-wrap: break-word;
+            hyphens: auto;
+        }
+        
+        .hero-slide p {
+            font-size: clamp(1rem, 2vw, 1.25rem);
+            line-height: 1.4;
+            margin-bottom: 30px;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            word-wrap: break-word;
+            hyphens: auto;
+        }
+        
+        .community-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+            padding: 40px 20px;
+            background: var(--bg-light);
+            border-radius: 12px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: var(--shadow-soft);
+            transition: var(--transition);
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            display: block;
+            line-height: 1;
+        }
+        
+        .stat-label {
+            font-size: 1rem;
+            color: var(--text-dark);
+            font-weight: 500;
+            line-height: 1.3;
+            word-wrap: break-word;
+        }
+        
+        .interactive-search {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            margin-bottom: 60px;
+            text-align: center;
+        }
+        
+        .search-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--text-dark);
+            line-height: 1.2;
+        }
+        
+        .search-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-light);
+            margin-bottom: 30px;
+            line-height: 1.4;
+        }
+        
+        .search-input-group {
+            display: flex;
+            max-width: 600px;
+            margin: 0 auto 20px;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .search-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 15px 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 25px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+        
+        .search-suggestions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        .suggestion-tag {
+            background: var(--bg-light);
+            color: var(--text-dark);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+        
+        .mood-picker {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            margin-bottom: 60px;
+            text-align: center;
+        }
+        
+        .mood-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--text-dark);
+            line-height: 1.2;
+        }
+        
+        .mood-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .mood-option {
+            background: var(--bg-light);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+        }
+        
+        .mood-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+        
+        .mood-label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            line-height: 1.3;
+            word-wrap: break-word;
+        }
+        
+        /* Mobile responsive fixes for homepage */
+        @media (max-width: 768px) {
+            .community-stats {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 30px 15px;
+            }
+            
+            .stat-item {
+                padding: 15px;
+            }
+            
+            .stat-number {
+                font-size: 2rem;
+            }
+            
+            .interactive-search,
+            .mood-picker {
+                padding: 30px 20px;
+            }
+            
+            .search-title,
+            .mood-title {
+                font-size: 1.5rem;
+            }
+            
+            .search-input-group {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .search-input {
+                min-width: auto;
+                width: 100%;
+            }
+            
+            .mood-options {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Beginner Mode Toggle -->
+    <div class="beginner-mode-toggle" id="beginnerModeToggle">
+        <span class="beginner-mode-label">Beginner Mode</span>
+        <div class="toggle-switch" id="toggleSwitch" onclick="toggleBeginnerMode()">
+            <div class="toggle-slider"></div>
+        </div>
+    </div>
+
+    <!-- Challenge Banner -->
+    <div class="challenge-banner" id="challengeBanner">
+        <div class="challenge-content">
+            <div class="challenge-icon">🍫</div>
+            <div class="challenge-text">
+                <span class="challenge-title">This Week's Challenge: Chocolate Desserts</span>
+                <span class="challenge-subtitle">Join 2,340+ home chefs creating amazing chocolate treats!</span>
+            </div>
+            <button class="btn btn-primary challenge-btn" onclick="joinChallenge()">Join Challenge</button>
+            <button class="challenge-close" onclick="closeChallenge()">×</button>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-globe"></i>
+                <span>TasteVerse</span>
+            </div>
+            
+            <div class="nav-search">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search recipes, ingredients, or cuisines..." id="searchInput">
+                    <button class="search-btn">
+                        <i class="fas fa-search"></i>
+                        Search
+                    </button>
+                </div>
+            </div>
+            
+            <div class="nav-menu">
+                <a href="index.html" class="nav-link active">
+                    <i class="fas fa-home"></i>
+                    Home
+                </a>
+                <a href="explore.html" class="nav-link">
+                    <i class="fas fa-search"></i>
+                    Explore
+                </a>
+                <a href="beginner-index.html" class="nav-link">
+                    <i class="fas fa-seedling"></i>
+                    Beginner Recipes
+                </a>
+                <a href="create-recipe.html" class="nav-link">
+                    <i class="fas fa-plus-circle"></i>
+                    Create
+                </a>
+                <a href="features.html" class="nav-link">
+                    <i class="fas fa-star"></i>
+                    Features
+                </a>
+                <a href="grocery-list.html" class="nav-link">
+                    <i class="fas fa-shopping-cart"></i>
+                    Grocery
+                </a>
+                <a href="user-profile.html" class="nav-link">
+                    <i class="fas fa-user"></i>
+                    Profile
+                </a>
+                <!-- Dark mode removed -->
+                <div class="nav-auth">
+                    <button class="login-btn" id="loginBtn" onclick="toggleLogin()">
+                        <i class="fas fa-user"></i>
+                        Login
+                    </button>
+                    <button class="btn btn-primary upload-btn" id="uploadBtn">
+                        <i class="fas fa-plus"></i> Upload Recipe
+                    </button>
+                </div>
+            </div>
+            
+            <div class="nav-toggle">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Normal Hero Section -->
+    <section class="hero-slider" id="normalHero">
+        <div class="hero-slides" id="heroSlides">
+            <!-- Slides will be generated dynamically -->
+        </div>
+        
+        <div class="hero-controls">
+            <button class="hero-prev" onclick="changeHeroSlide(-1)"><i class="fas fa-chevron-left"></i></button>
+            <button class="hero-next" onclick="changeHeroSlide(1)"><i class="fas fa-chevron-right"></i></button>
+        </div>
+        
+        <div class="hero-dots" id="heroDots">
+            <!-- Dots will be generated dynamically -->
+        </div>
+    </section>
+
+    <!-- Beginner Mode Hero Section -->
+    <section class="beginner-hero" id="beginnerHero" style="display: none;">
+        <div class="beginner-hero-content">
+            <div class="beginner-welcome">
+                <div class="beginner-icon">👨‍🍳</div>
+                <h1>Welcome to Your Cooking Journey!</h1>
+                <p>Don't worry, everyone starts somewhere. We'll guide you through every step!</p>
+            </div>
+            
+            <div class="beginner-steps">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Choose What You Want to Cook</h3>
+                        <p>Pick from simple, easy recipes perfect for beginners</p>
+                        <button class="btn btn-primary" onclick="scrollToSection('beginnerRecipes')">
+                            <i class="fas fa-utensils"></i> Browse Easy Recipes
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Get Your Ingredients</h3>
+                        <p>We'll tell you exactly what you need and where to find it</p>
+                        <button class="btn btn-outline" onclick="scrollToSection('beginnerIngredients')">
+                            <i class="fas fa-shopping-cart"></i> Shopping List
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Follow Step-by-Step</h3>
+                        <p>Detailed instructions with pictures and tips</p>
+                        <button class="btn btn-outline" onclick="scrollToSection('beginnerGuide')">
+                            <i class="fas fa-book-open"></i> Cooking Guide
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Normal Community Stats -->
+    <section class="community-stats" id="normalStats">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-icon">📚</div>
+                    <div class="stat-number" id="recipeCount">15,247</div>
+                    <div class="stat-label">Recipes Shared</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-number" id="activeUsers">2,340</div>
+                    <div class="stat-label">Users Cooking Now</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">🆕</div>
+                    <div class="stat-number" id="newRecipes">127</div>
+                    <div class="stat-label">New Recipes Today</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">⭐</div>
+                    <div class="stat-number" id="avgRating">4.7</div>
+                    <div class="stat-label">Average Rating</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Beginner Mode Stats -->
+    <section class="beginner-stats" id="beginnerStats" style="display: none;">
+        <div class="container">
+            <h2>You're Not Alone! 🌟</h2>
+            <div class="beginner-encouragement">
+                <div class="encouragement-card">
+                    <div class="encouragement-icon">🎯</div>
+                    <h3>Start Simple</h3>
+                    <p>Begin with easy recipes and build your confidence</p>
+                </div>
+                <div class="encouragement-card">
+                    <div class="encouragement-icon">⏰</div>
+                    <h3>Take Your Time</h3>
+                    <p>There's no rush - cooking should be fun and relaxing</p>
+                </div>
+                <div class="encouragement-card">
+                    <div class="encouragement-icon">🤝</div>
+                    <h3>Ask for Help</h3>
+                    <p>Our community is here to support you every step of the way</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Normal Interactive Search Section -->
+    <section class="interactive-search" id="normalSearch">
+        <div class="container">
+            <h2>What's in your kitchen? 🥘</h2>
+            <p>Tell us what ingredients you have, and we'll suggest amazing recipes!</p>
+            
+            <div class="ingredient-search">
+                <div class="ingredient-input-container">
+                    <input type="text" placeholder="Type ingredients (e.g., tomato, onion, pasta)" id="ingredientInput">
+                    <button class="btn btn-primary" onclick="searchByIngredients()">
+                        <i class="fas fa-magic"></i> Find Recipes
+                    </button>
+                </div>
+                
+                <div class="ingredient-tags" id="ingredientTags">
+                    <!-- Selected ingredients will appear here -->
+                </div>
+                
+                <div class="suggested-ingredients">
+                    <span class="suggestion-label">Popular ingredients:</span>
+                    <div class="ingredient-suggestions">
+                        <span class="ingredient-chip" onclick="addIngredient('tomato')">tomato</span>
+                        <span class="ingredient-chip" onclick="addIngredient('onion')">onion</span>
+                        <span class="ingredient-chip" onclick="addIngredient('chicken')">chicken</span>
+                        <span class="ingredient-chip" onclick="addIngredient('pasta')">pasta</span>
+                        <span class="ingredient-chip" onclick="addIngredient('cheese')">cheese</span>
+                        <span class="ingredient-chip" onclick="addIngredient('garlic')">garlic</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Beginner Mode Search Section -->
+    <section class="beginner-search" id="beginnerSearch" style="display: none;">
+        <div class="container">
+            <h2>Let's Find You a Perfect Recipe! 🍳</h2>
+            <p>Don't worry about having fancy ingredients - we'll work with what you have!</p>
+            
+            <div class="beginner-tip">
+                <strong>💡 Beginner Tip:</strong> Start with simple ingredients you already have at home. Great meals can be made with basic items!
+            </div>
+            
+            <div class="beginner-ingredient-selector">
+                <h3>What do you have in your kitchen?</h3>
+                <div class="ingredient-categories">
+                    <div class="ingredient-category">
+                        <h4>🥬 Vegetables</h4>
+                        <div class="ingredient-options">
+                            <button class="ingredient-btn" onclick="addBeginnerIngredient('tomato')">Tomato</button>
+                            <button class="ingredient-btn" onclick="addBeginnerIngredient('onion')">Onion</button>
+                            <button class="ingredient-btn" onclick="addBeginnerIngredient('potato')">Potato</button>
+                            <button class="ingredient-btn" onclick="addBeginnerIngredient('carrot')">Carrot</button>
+                        </div>
+                    </div>
+                    
+                    <div class="ingredient-category">
+                        <h4>🥩 Proteins</h4>
+                        <div class="ingredient-options">
+                            <button class="ingredient-btn" onclick="addBeginnerIngredient('chicken')">Chicken</button>
+                            <button class="ingredient-btn" onclick="addBeginnerIngredient('eggs')">Eggs</button>
+                            <button class="ingredient-btn" onclick="addBeginnerIngredient('cheese')">Cheese</button>
+                            <button class="ingredient-btn" onclick="addBeginnerIngredient('beans')">Beans</button>
+                        </div>
+                    </div>
+                    
+                    <div class="ingredient-category">
+                        <h4>🍝 Grains</h4>
+                        <div class="ingredient-options">
+                            <button class="ingredient-btn" onclick="addBeginnerIngredient('pasta')">Pasta</button>
+                            <button class="ingredient-btn" onclick="addBeginnerIngredient('rice')">Rice</button>
+                            <button class="ingredient-btn" onclick="addBeginnerIngredient('bread')">Bread</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="selected-ingredients" id="beginnerSelectedIngredients">
+                    <h4>Your Ingredients:</h4>
+                    <div class="selected-list" id="beginnerIngredientList">
+                        <p class="no-ingredients">No ingredients selected yet</p>
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary btn-large" onclick="findBeginnerRecipes()">
+                    <i class="fas fa-search"></i> Find Easy Recipes for Me!
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Mood-Based Recipe Picker -->
+    <section class="mood-picker">
+        <div class="container">
+            <h2>What's your cooking mood today? 😊</h2>
+            <div class="mood-grid">
+                <div class="mood-card" data-mood="impress" onclick="filterByMood('impress')">
+                    <div class="mood-icon">🤩</div>
+                    <h3>Impress Guests</h3>
+                    <p>Show-stopping recipes for special occasions</p>
+                </div>
+                <div class="mood-card" data-mood="lazy" onclick="filterByMood('lazy')">
+                    <div class="mood-icon">💤</div>
+                    <h3>Lazy Day</h3>
+                    <p>Easy, no-fuss recipes for relaxed cooking</p>
+                </div>
+                <div class="mood-card" data-mood="quick" onclick="filterByMood('quick')">
+                    <div class="mood-icon">⏱️</div>
+                    <h3>15-Min Quick Fix</h3>
+                    <p>Fast and delicious meals in no time</p>
+                </div>
+                <div class="mood-card" data-mood="healthy" onclick="filterByMood('healthy')">
+                    <div class="mood-icon">🏋️‍♀️</div>
+                    <h3>Healthy & Light</h3>
+                    <p>Nutritious recipes for a healthy lifestyle</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Recipe Roulette -->
+    <section class="recipe-roulette">
+        <div class="container">
+            <div class="roulette-content">
+                <h2>Can't decide what to cook? 🎲</h3>
+                <p>Let us surprise you with a random recipe!</p>
+                <button class="btn btn-primary btn-large roulette-btn" onclick="spinRoulette()">
+                    <i class="fas fa-dice"></i> Recipe Roulette
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Creator Spotlight -->
+    <section class="creator-spotlight">
+        <div class="container">
+            <div class="spotlight-header">
+                <h2><i class="fas fa-star"></i> Featured Home Chef</h2>
+                <span class="spotlight-badge">Chef of the Month</span>
+            </div>
+            
+            <div class="creator-card">
+                <div class="creator-info">
+                    <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80" alt="Emma Green" class="creator-avatar">
+                    <div class="creator-details">
+                        <h3>Emma Green</h3>
+                        <p class="creator-bio">Passionate home chef specializing in healthy, plant-based recipes. Follow for daily inspiration!</p>
+                        <div class="creator-stats">
+                            <span><i class="fas fa-users"></i> 12.5K followers</span>
+                            <span><i class="fas fa-utensils"></i> 47 recipes</span>
+                            <span><i class="fas fa-star"></i> 4.9 rating</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="creator-recipe">
+                    <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Quinoa Buddha Bowl" class="recipe-preview">
+                    <div class="recipe-info">
+                        <h4>Quinoa Buddha Bowl</h4>
+                        <p>Her most popular recipe with 2.3K saves</p>
+                        <div class="recipe-meta">
+                            <span><i class="fas fa-clock"></i> 25 min</span>
+                            <span><i class="fas fa-star"></i> 4.8</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="btn btn-outline follow-btn">
+                    <i class="fas fa-plus"></i> Follow Emma
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Video Preview Section -->
+    <section class="video-preview">
+        <div class="container">
+            <h2>Watch & Cook 🎥</h2>
+            <p>Short recipe videos to inspire your next meal</p>
+            
+            <div class="video-grid">
+                <div class="video-card" onclick="playVideo('pasta')">
+                    <div class="video-thumbnail">
+                        <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Pasta Recipe">
+                        <div class="play-button">
+                            <i class="fas fa-play"></i>
+                        </div>
+                        <div class="video-duration">2:30</div>
+                    </div>
+                    <div class="video-info">
+                        <h4>Quick Pasta Carbonara</h4>
+                        <p>by Chef Marco</p>
+                        <div class="video-stats">
+                            <span><i class="fas fa-eye"></i> 12K views</span>
+                            <span><i class="fas fa-heart"></i> 340 likes</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="video-card" onclick="playVideo('dessert')">
+                    <div class="video-thumbnail">
+                        <img src="https://images.unsplash.com/photo-1551024506-0bccd828d307?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Chocolate Cake">
+                        <div class="play-button">
+                            <i class="fas fa-play"></i>
+                        </div>
+                        <div class="video-duration">4:15</div>
+                    </div>
+                    <div class="video-info">
+                        <h4>Chocolate Lava Cake</h4>
+                        <p>by Sweet Sarah</p>
+                        <div class="video-stats">
+                            <span><i class="fas fa-eye"></i> 8.5K views</span>
+                            <span><i class="fas fa-heart"></i> 520 likes</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="video-card" onclick="playVideo('smoothie')">
+                    <div class="video-thumbnail">
+                        <img src="https://images.unsplash.com/photo-1546554137-f86b9593a222?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Smoothie Bowl">
+                        <div class="play-button">
+                            <i class="fas fa-play"></i>
+                        </div>
+                        <div class="video-duration">1:45</div>
+                    </div>
+                    <div class="video-info">
+                        <h4>Rainbow Smoothie Bowl</h4>
+                        <p>by Healthy Hannah</p>
+                        <div class="video-stats">
+                            <span><i class="fas fa-eye"></i> 15K views</span>
+                            <span><i class="fas fa-heart"></i> 890 likes</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Seasonal Highlights -->
+    <section class="seasonal-highlights">
+        <div class="container">
+            <h2>Cook What's in Season 🍊</h2>
+            <p>Fresh, seasonal ingredients make the best recipes</p>
+            
+            <div class="seasonal-grid">
+                <div class="seasonal-card">
+                    <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Winter Squash">
+                    <div class="seasonal-content">
+                        <h3>Winter Squash</h3>
+                        <p>Perfect for soups and roasts</p>
+                        <span class="seasonal-count">23 recipes</span>
+                    </div>
+                </div>
+                
+                <div class="seasonal-card">
+                    <img src="https://images.unsplash.com/photo-1566385101042-1a0aa0c1268c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Citrus">
+                    <div class="seasonal-content">
+                        <h3>Citrus Fruits</h3>
+                        <p>Bright and refreshing flavors</p>
+                        <span class="seasonal-count">18 recipes</span>
+                    </div>
+                </div>
+                
+                <div class="seasonal-card">
+                    <img src="https://images.unsplash.com/photo-1518977676601-b53f82aba655?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Root Vegetables">
+                    <div class="seasonal-content">
+                        <h3>Root Vegetables</h3>
+                        <p>Hearty and nutritious</p>
+                        <span class="seasonal-count">31 recipes</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Smart Grocery List Widget -->
+    <section class="grocery-widget">
+        <div class="container">
+            <div class="widget-content">
+                <h2>🛍️ Your Smart Grocery List</h2>
+                <p>Save ingredients from recipes and create your shopping list</p>
+                
+                <div class="grocery-preview">
+                    <div class="grocery-items">
+                        <div class="grocery-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>2 lbs chicken breast</span>
+                        </div>
+                        <div class="grocery-item">
+                            <i class="far fa-circle"></i>
+                            <span>1 lb pasta</span>
+                        </div>
+                        <div class="grocery-item">
+                            <i class="far fa-circle"></i>
+                            <span>3 tomatoes</span>
+                        </div>
+                        <div class="grocery-item">
+                            <i class="far fa-circle"></i>
+                            <span>Fresh basil</span>
+                        </div>
+                    </div>
+                    
+                    <div class="grocery-actions">
+                        <button class="btn btn-outline">
+                            <i class="fas fa-print"></i> Print List
+                        </button>
+                        <button class="btn btn-primary">
+                            <i class="fas fa-mobile-alt"></i> Send to Phone
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Advanced Features Showcase -->
+    <section class="advanced-features" style="background: var(--bg-lighter); padding: 80px 0;">
+        <div class="container">
+            <div class="section-header">
+                <h2><i class="fas fa-magic"></i> Revolutionary Cooking Features</h2>
+                <p class="section-subtitle">Experience the future of cooking with AI-powered tools and smart kitchen integration</p>
+            </div>
+            
+            <div class="feature-showcase-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin: 48px 0;">
+                <div class="feature-showcase-card" style="background: var(--bg-white); padding: 32px; border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); text-align: center; transition: var(--transition);">
+                    <div style="width: 80px; height: 80px; background: var(--bg-gradient); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; font-size: 2rem; color: white;">
+                        <i class="fas fa-barcode"></i>
+                    </div>
+                    <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 16px; color: var(--text-dark);">Ingredient Scanner</h3>
+                    <p style="color: var(--text-medium); margin-bottom: 24px; line-height: 1.6;">Scan barcodes to instantly add ingredients to your digital pantry</p>
+                    <button class="btn btn-outline btn-sm">Try Now</button>
+                </div>
+                
+                <div class="feature-showcase-card" style="background: var(--bg-white); padding: 32px; border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); text-align: center; transition: var(--transition);">
+                    <div style="width: 80px; height: 80px; background: var(--bg-gradient); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; font-size: 2rem; color: white;">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 16px; color: var(--text-dark);">Collaborative Cooking</h3>
+                    <p style="color: var(--text-medium); margin-bottom: 24px; line-height: 1.6;">Cook together in real-time with friends and family</p>
+                    <button class="btn btn-outline btn-sm">Start Session</button>
+                </div>
+                
+                <div class="feature-showcase-card" style="background: var(--bg-white); padding: 32px; border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); text-align: center; transition: var(--transition);">
+                    <div style="width: 80px; height: 80px; background: var(--bg-gradient); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; font-size: 2rem; color: white;">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 16px; color: var(--text-dark);">Gamification</h3>
+                    <p style="color: var(--text-medium); margin-bottom: 24px; line-height: 1.6;">Earn badges and rewards for cooking achievements</p>
+                    <button class="btn btn-outline btn-sm">View Rewards</button>
+                </div>
+                
+                <div class="feature-showcase-card" style="background: var(--bg-white); padding: 32px; border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); text-align: center; transition: var(--transition);">
+                    <div style="width: 80px; height: 80px; background: var(--bg-gradient); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; font-size: 2rem; color: white;">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 16px; color: var(--text-dark);">Smart Purchasing</h3>
+                    <p style="color: var(--text-medium); margin-bottom: 24px; line-height: 1.6;">Order missing ingredients through Blinkit & Swiggy</p>
+                    <button class="btn btn-outline btn-sm">Shop Now</button>
+                </div>
+                
+                <div class="feature-showcase-card" style="background: var(--bg-white); padding: 32px; border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); text-align: center; transition: var(--transition);">
+                    <div style="width: 80px; height: 80px; background: var(--bg-gradient); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; font-size: 2rem; color: white;">
+                        <i class="fas fa-heart-pulse"></i>
+                    </div>
+                    <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 16px; color: var(--text-dark);">Allergy Safe</h3>
+                    <p style="color: var(--text-medium); margin-bottom: 24px; line-height: 1.6;">Smart substitutions for allergies & dietary restrictions</p>
+                    <button class="btn btn-outline btn-sm">Set Preferences</button>
+                </div>
+                
+                <div class="feature-showcase-card" style="background: var(--bg-white); padding: 32px; border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); text-align: center; transition: var(--transition);">
+                    <div style="width: 80px; height: 80px; background: var(--bg-gradient); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; font-size: 2rem; color: white;">
+                        <i class="fas fa-download"></i>
+                    </div>
+                    <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 16px; color: var(--text-dark);">Offline Mode</h3>
+                    <p style="color: var(--text-medium); margin-bottom: 24px; line-height: 1.6;">Download recipes for offline cooking</p>
+                    <button class="btn btn-outline btn-sm">Download</button>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 48px;">
+                <a href="features.html" class="btn btn-primary btn-lg">
+                    <i class="fas fa-rocket"></i> Explore All Features
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Trending Recipes -->
+    <section class="trending-recipes">
+        <div class="container">
+            <div class="section-header">
+                <h2><i class="fas fa-fire"></i> Trending This Week</h2>
+                <a href="explore.html?sort=trending" class="view-all">View All <i class="fas fa-arrow-right"></i></a>
+            </div>
+            
+            <div class="recipe-grid" id="trendingRecipes">
+                <!-- Recipes will be loaded dynamically -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Personalized For You Section -->
+    <section class="for-you-section">
+        <div class="container">
+            <h2>For You 💝</h2>
+            <p>Recipes tailored to your taste preferences</p>
+            
+            <div class="for-you-grid" id="forYouRecipes">
+                <!-- Personalized recipes will be loaded dynamically -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter Section -->
+    <section class="newsletter">
+        <div class="container">
+            <div class="newsletter-content">
+                <h2>🍴 Get weekly recipe inspiration straight to your inbox!</h2>
+                <p>Join 50,000+ food lovers getting the best recipes every week</p>
+                <div class="newsletter-form">
+                    <input type="email" placeholder="Enter your email address" id="newsletterEmail">
+                    <button class="btn btn-primary">Subscribe</button>
+                </div>
+                <p class="newsletter-privacy">We respect your privacy. Unsubscribe at any time.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <i class="fas fa-utensils"></i>
+                        <span>RecipeHub</span>
+                    </div>
+                    <p>Connecting food lovers worldwide through the joy of cooking and sharing recipes.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                        <a href="#"><i class="fab fa-pinterest"></i></a>
+                        <a href="#"><i class="fab fa-tiktok"></i></a>
+                    </div>
+                    <div class="open-source-badge">
+                        <i class="fab fa-github"></i>
+                        <span>Open Source</span>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Explore</h3>
+                    <ul>
+                        <li><a href="explore.html">Browse Recipes</a></li>
+                        <li><a href="vegan.html">Vegan Recipes</a></li>
+                        <li><a href="quick.html">Quick Meals</a></li>
+                        <li><a href="#">Trending</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Community</h3>
+                    <ul>
+                        <li><a href="create-recipe.html">Create Recipe</a></li>
+                        <li><a href="#">Join Community</a></li>
+                        <li><a href="#">Guidelines</a></li>
+                        <li><a href="#">Support</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Company</h3>
+                    <ul>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2024 RecipeHub. All rights reserved. Made with ❤️ by the community.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Recipe Roulette Modal -->
+    <div class="modal" id="rouletteModal">
+        <div class="modal-content roulette-modal">
+            <div class="modal-header">
+                <h2>🎲 Your Random Recipe</h2>
+                <button class="modal-close" onclick="closeRoulette()">&times;</button>
+            </div>
+            <div class="roulette-result" id="rouletteResult">
+                <!-- Random recipe will be displayed here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Video Modal -->
+    <div class="modal" id="videoModal">
+        <div class="modal-content video-modal">
+            <div class="modal-header">
+                <h2 id="videoTitle">Recipe Video</h2>
+                <button class="modal-close" onclick="closeVideo()">&times;</button>
+            </div>
+            <div class="video-player" id="videoPlayer">
+                <!-- Video will be embedded here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Enhanced homepage functionality
+        let currentHeroSlide = 0;
+        let heroSlides = [];
+        let selectedIngredients = [];
+        let isLoggedIn = false; // This would come from authentication
+
+        // Initialize homepage
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.innerHTML = `
+                <div class="notification-content">
+                    <span class="notification-message">${message}</span>
+                    <button class="notification-close" onclick="this.parentElement.parentElement.remove()">&times;</button>
+                </div>
+            `;
+            
+            // Add styles
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? '#27ae60' : type === 'warning' ? '#f39c12' : type === 'error' ? '#e74c3c' : '#3498db'};
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                z-index: 10000;
+                max-width: 400px;
+                animation: slideIn 0.3s ease;
+            `;
+            
+            // Add to page
+            document.body.appendChild(notification);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Dark mode removed
+            initializeHeroSlider();
+            updateCommunityStats();
+            loadTrendingRecipes();
+            loadForYouRecipes();
+            setupEventListeners();
+            initializeBeginnerMode();
+        });
+
+        function initializeHeroSlider() {
+            heroSlides = [
+                {
+                    image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+                    alt: "Diverse group of people cooking together in a modern kitchen, representing global recipe sharing community",
+                    title: "Discover, Cook & Share Recipes with the World 🌍",
+                    subtitle: "Join thousands of food lovers. Explore, rate, and create your own recipes.",
+                    cta1: "Explore Recipes",
+                    cta2: "Upload Your First Recipe"
+                },
+                {
+                    image: "https://images.unsplash.com/photo-1551024506-0bccd828d307?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+                    alt: "Beautiful chocolate lava cake with berries and mint garnish, representing gourmet desserts and culinary variety",
+                    title: "From Quick Weeknight Dinners to Show-Stopping Desserts",
+                    subtitle: "Find the perfect recipe for every occasion and skill level.",
+                    cta1: "Browse Categories",
+                    cta2: "Join Challenge"
+                },
+                {
+                    image: "https://images.unsplash.com/photo-1512058564366-18510be2db19?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+                    alt: "Professional chef and home cooks collaborating in kitchen, representing community and culinary inspiration",
+                    title: "Connect with Amazing Home Chefs",
+                    subtitle: "Follow your favorite creators and discover new culinary inspirations.",
+                    cta1: "Meet Chefs",
+                    cta2: "Start Following"
+                }
+            ];
+
+            renderHeroSlides();
+            startHeroAutoPlay();
+        }
+
+        function renderHeroSlides() {
+            const slidesContainer = document.getElementById('heroSlides');
+            const dotsContainer = document.getElementById('heroDots');
+
+            slidesContainer.innerHTML = heroSlides.map((slide, index) => `
+                <div class="hero-slide ${index === 0 ? 'active' : ''}" style="background: linear-gradient(135deg, #ff6b35 0%, #f39c12 100%);">
+                    <img src="${slide.image}" alt="${slide.alt}" class="hero-background-image" onload="console.log('Image loaded:', '${slide.title}')" onerror="console.error('Image failed to load:', '${slide.image}')">
+                    <div class="hero-slide-content">
+                        <h1>${slide.title}</h1>
+                        <p>${slide.subtitle}</p>
+                        <div class="hero-actions">
+                            <button class="btn btn-primary btn-large" onclick="scrollToSection('interactive-search')">
+                                ${slide.cta1}
+                            </button>
+                            <button class="btn btn-outline btn-large" onclick="window.location.href='create-recipe.html'">
+                                ${slide.cta2}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            dotsContainer.innerHTML = heroSlides.map((_, index) => `
+                <button class="hero-dot ${index === 0 ? 'active' : ''}" onclick="goToSlide(${index})"></button>
+            `).join('');
+        }
+
+        function changeHeroSlide(direction) {
+            currentHeroSlide += direction;
+            if (currentHeroSlide >= heroSlides.length) currentHeroSlide = 0;
+            if (currentHeroSlide < 0) currentHeroSlide = heroSlides.length - 1;
+            goToSlide(currentHeroSlide);
+        }
+
+        function goToSlide(index) {
+            currentHeroSlide = index;
+            
+            // Update slides
+            document.querySelectorAll('.hero-slide').forEach((slide, i) => {
+                slide.classList.toggle('active', i === index);
+            });
+            
+            // Update dots
+            document.querySelectorAll('.hero-dot').forEach((dot, i) => {
+                dot.classList.toggle('active', i === index);
+            });
+        }
+
+        function startHeroAutoPlay() {
+            setInterval(() => {
+                changeHeroSlide(1);
+            }, 5000);
+        }
+
+        function updateCommunityStats() {
+            // Simulate live updating stats
+            const stats = {
+                recipeCount: 15247,
+                activeUsers: 2340,
+                newRecipes: 127,
+                avgRating: 4.7
+            };
+
+            // Animate numbers
+            animateNumber('recipeCount', stats.recipeCount);
+            animateNumber('activeUsers', stats.activeUsers);
+            animateNumber('newRecipes', stats.newRecipes);
+            animateNumber('avgRating', stats.avgRating, 1);
+        }
+
+        function animateNumber(elementId, targetValue, decimals = 0) {
+            const element = document.getElementById(elementId);
+            const startValue = 0;
+            const duration = 2000;
+            const startTime = performance.now();
+
+            function updateNumber(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const currentValue = startValue + (targetValue - startValue) * progress;
+                
+                element.textContent = currentValue.toFixed(decimals).toLocaleString();
+                
+                if (progress < 1) {
+                    requestAnimationFrame(updateNumber);
+                }
+            }
+
+            requestAnimationFrame(updateNumber);
+        }
+
+        function addIngredient(ingredient) {
+            if (!selectedIngredients.includes(ingredient)) {
+                selectedIngredients.push(ingredient);
+                updateIngredientTags();
+            }
+        }
+
+        function removeIngredient(ingredient) {
+            selectedIngredients = selectedIngredients.filter(ing => ing !== ingredient);
+            updateIngredientTags();
+        }
+
+        function updateIngredientTags() {
+            const tagsContainer = document.getElementById('ingredientTags');
+            tagsContainer.innerHTML = selectedIngredients.map(ingredient => `
+                <span class="ingredient-tag">
+                    ${ingredient}
+                    <button onclick="removeIngredient('${ingredient}')">×</button>
+                </span>
+            `).join('');
+        }
+
+        function searchByIngredients() {
+            if (selectedIngredients.length === 0) {
+                const input = document.getElementById('ingredientInput');
+                const ingredients = input.value.split(',').map(ing => ing.trim()).filter(ing => ing);
+                selectedIngredients = [...ingredients];
+                updateIngredientTags();
+                input.value = '';
+            }
+
+            if (selectedIngredients.length > 0) {
+                // Redirect to browse page with ingredient filter
+                const ingredientQuery = selectedIngredients.join(',');
+                window.location.href = `explore.html?ingredients=${encodeURIComponent(ingredientQuery)}`;
+            }
+        }
+
+        function filterByMood(mood) {
+            const moodFilters = {
+                impress: 'difficulty=Hard&sort=rating',
+                lazy: 'difficulty=Easy&time=30',
+                quick: 'time=15&sort=time',
+                healthy: 'category=healthy&dietary=vegan,vegetarian'
+            };
+
+            window.location.href = `explore.html?${moodFilters[mood]}`;
+        }
+
+        function spinRoulette() {
+            const recipes = [
+                {
+                    title: "Spicy Thai Basil Chicken",
+                    image: "https://images.unsplash.com/photo-1512058564366-18510be2db19?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+                    time: "25 min",
+                    difficulty: "Medium",
+                    rating: 4.6
+                },
+                {
+                    title: "Chocolate Chip Cookies",
+                    image: "https://images.unsplash.com/photo-1551024506-0bccd828d307?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+                    time: "30 min",
+                    difficulty: "Easy",
+                    rating: 4.8
+                },
+                {
+                    title: "Mediterranean Quinoa Bowl",
+                    image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+                    time: "20 min",
+                    difficulty: "Easy",
+                    rating: 4.7
+                }
+            ];
+
+            const randomRecipe = recipes[Math.floor(Math.random() * recipes.length)];
+            
+            document.getElementById('rouletteResult').innerHTML = `
+                <div class="roulette-recipe">
+                    <img src="${randomRecipe.image}" alt="${randomRecipe.title}">
+                    <div class="roulette-recipe-info">
+                        <h3>${randomRecipe.title}</h3>
+                        <div class="roulette-meta">
+                            <span><i class="fas fa-clock"></i> ${randomRecipe.time}</span>
+                            <span><i class="fas fa-signal"></i> ${randomRecipe.difficulty}</span>
+                            <span><i class="fas fa-star"></i> ${randomRecipe.rating}</span>
+                        </div>
+                        <p>Perfect choice! This recipe is trending and highly rated by our community.</p>
+                        <button class="btn btn-primary" onclick="window.location.href='recipe-detail.html?id=random'">
+                            <i class="fas fa-play"></i> Start Cooking
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('rouletteModal').style.display = 'flex';
+        }
+
+        function closeRoulette() {
+            document.getElementById('rouletteModal').style.display = 'none';
+        }
+
+        function playVideo(videoType) {
+            const videos = {
+                pasta: {
+                    title: "Quick Pasta Carbonara",
+                    url: "https://www.youtube.com/embed/dQw4w9WgXcQ" // Placeholder
+                },
+                dessert: {
+                    title: "Chocolate Lava Cake",
+                    url: "https://www.youtube.com/embed/dQw4w9WgXcQ" // Placeholder
+                },
+                smoothie: {
+                    title: "Rainbow Smoothie Bowl",
+                    url: "https://www.youtube.com/embed/dQw4w9WgXcQ" // Placeholder
+                }
+            };
+
+            const video = videos[videoType];
+            document.getElementById('videoTitle').textContent = video.title;
+            document.getElementById('videoPlayer').innerHTML = `
+                <iframe src="${video.url}" frameborder="0" allowfullscreen></iframe>
+            `;
+            document.getElementById('videoModal').style.display = 'flex';
+        }
+
+        function closeVideo() {
+            document.getElementById('videoModal').style.display = 'none';
+        }
+
+        function joinChallenge() {
+            alert('Welcome to the Chocolate Desserts Challenge! 🍫\n\nYou can now submit your chocolate dessert recipes and compete with other home chefs. Good luck!');
+        }
+
+        function closeChallenge() {
+            document.getElementById('challengeBanner').style.display = 'none';
+        }
+
+        function scrollToSection(sectionId) {
+            document.getElementById(sectionId).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function loadTrendingRecipes() {
+            // This would load actual trending recipes
+            const trendingContainer = document.getElementById('trendingRecipes');
+            trendingContainer.innerHTML = `
+                <div class="recipe-card">
+                    <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Pasta">
+                    <div class="recipe-content">
+                        <h3>Spicy Arrabbiata Pasta</h3>
+                        <div class="recipe-meta">
+                            <span><i class="fas fa-clock"></i> 20 min</span>
+                            <span><i class="fas fa-users"></i> 4 servings</span>
+                        </div>
+                        <div class="recipe-rating">
+                            <div class="stars">★★★★★</div>
+                            <span>4.8 (234)</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- More recipe cards would be added here -->
+            `;
+        }
+
+        function loadForYouRecipes() {
+            if (isLoggedIn) {
+                // Load personalized recommendations
+                document.getElementById('forYouRecipes').innerHTML = `
+                    <p>Loading your personalized recommendations...</p>
+                `;
+            } else {
+                // Show popular categories for new users
+                document.getElementById('forYouRecipes').innerHTML = `
+                    <div class="popular-categories">
+                        <h3>Popular Categories to Explore</h3>
+                        <div class="category-chips">
+                            <span class="chip" onclick="window.location.href='vegan.html'">Vegan</span>
+                            <span class="chip" onclick="window.location.href='quick.html'">Quick Meals</span>
+                            <span class="chip" onclick="window.location.href='explore.html?category=desserts'">Desserts</span>
+                            <span class="chip" onclick="window.location.href='explore.html?category=healthy'">Healthy</span>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function setupEventListeners() {
+            // Mobile menu toggle
+            const navToggle = document.querySelector('.nav-toggle');
+            const navMenu = document.querySelector('.nav-menu');
+            
+            if (navToggle && navMenu) {
+                navToggle.addEventListener('click', function() {
+                    navMenu.classList.toggle('active');
+                    const icon = navToggle.querySelector('i');
+                    if (navMenu.classList.contains('active')) {
+                        icon.className = 'fas fa-times';
+                    } else {
+                        icon.className = 'fas fa-bars';
+                    }
+                });
+            }
+            
+            // Close mobile menu when clicking on a link
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    if (navMenu && navMenu.classList.contains('active')) {
+                        navMenu.classList.remove('active');
+                        const icon = navToggle.querySelector('i');
+                        icon.className = 'fas fa-bars';
+                    }
+                });
+            });
+            
+            // Nav search button → redirect to browse with query
+            const navSearchBtn = document.querySelector('.nav-search .search-btn');
+            if (navSearchBtn) {
+                navSearchBtn.addEventListener('click', function() {
+                    const term = (document.getElementById('searchInput')?.value || '').trim();
+                    const url = term ? `explore.html?q=${encodeURIComponent(term)}` : 'explore.html';
+                    window.location.href = url;
+                });
+            }
+            
+            // Search input enter key functionality
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        const term = this.value.trim();
+                        const url = term ? `explore.html?q=${encodeURIComponent(term)}` : 'explore.html';
+                        window.location.href = url;
+                    }
+                });
+            }
+            // Ingredient input
+            document.getElementById('ingredientInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchByIngredients();
+                }
+            });
+
+            // Upload button
+            document.getElementById('uploadBtn').addEventListener('click', function() {
+                window.location.href = 'create-recipe.html';
+            });
+
+            // Newsletter subscription
+            document.querySelector('.newsletter-form button').addEventListener('click', function() {
+                const email = document.getElementById('newsletterEmail').value;
+                if (email) {
+                    alert('Thank you for subscribing! You\'ll receive our weekly recipe inspiration soon. 🍴');
+                    document.getElementById('newsletterEmail').value = '';
+                }
+            });
+        }
+
+        // Theme management
+        function initTheme() {
+            const saved = localStorage.getItem('rh_theme');
+            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = saved || (prefersDark ? 'dark' : 'light');
+            setTheme(theme);
+        }
+
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('rh_theme', theme);
+            const icon = document.querySelector('#themeToggle i');
+            if (icon) {
+                icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+            }
+        }
+
+        function toggleTheme() {
+            const current = document.documentElement.getAttribute('data-theme') || 'light';
+            setTheme(current === 'dark' ? 'light' : 'dark');
+        }
+
+        // Close modals when clicking outside
+        window.addEventListener('click', function(e) {
+            if (e.target.classList.contains('modal')) {
+                e.target.style.display = 'none';
+            }
+        });
+
+        // Beginner Mode Functions
+        function initializeBeginnerMode() {
+            // Load saved beginner mode state
+            const isBeginnerMode = localStorage.getItem('tasteverse_beginner_mode') === 'true';
+            if (isBeginnerMode) {
+                enableBeginnerMode();
+            }
+            
+            // Ensure toggle is visible
+            const toggle = document.getElementById('beginnerModeToggle');
+            if (toggle) {
+                toggle.style.display = 'flex';
+                toggle.style.visibility = 'visible';
+                toggle.style.opacity = '1';
+                toggle.style.position = 'fixed';
+                toggle.style.top = '20px';
+                toggle.style.right = '20px';
+                toggle.style.zIndex = '9999';
+            }
+        }
+
+        function toggleBeginnerMode() {
+            const body = document.body;
+            const toggleSwitch = document.getElementById('toggleSwitch');
+            const isCurrentlyActive = body.classList.contains('beginner-mode');
+            
+            if (isCurrentlyActive) {
+                disableBeginnerMode();
+            } else {
+                enableBeginnerMode();
+            }
+        }
+
+        function enableBeginnerMode() {
+            // Redirect to dedicated beginner page
+            localStorage.setItem('tasteverse_beginner_mode', 'true');
+            showNotification('Switching to Beginner Mode... 🍳', 'info');
+            
+            setTimeout(() => {
+                window.location.href = 'beginner-index.html';
+            }, 1000);
+        }
+
+        function disableBeginnerMode() {
+            const body = document.body;
+            const toggleSwitch = document.getElementById('toggleSwitch');
+            
+            body.classList.remove('beginner-mode');
+            toggleSwitch.classList.remove('active');
+            localStorage.setItem('tasteverse_beginner_mode', 'false');
+            
+            // Hide beginner tips
+            hideBeginnerTips();
+        }
+
+        function showBeginnerTips() {
+            const tips = document.querySelectorAll('.beginner-tip');
+            tips.forEach(tip => {
+                tip.style.display = 'block';
+            });
+        }
+
+        function hideBeginnerTips() {
+            const tips = document.querySelectorAll('.beginner-tip');
+            tips.forEach(tip => {
+                tip.style.display = 'none';
+            });
+        }
+
+        function showBeginnerWelcome() {
+            // Create welcome notification
+            const notification = document.createElement('div');
+            notification.className = 'beginner-welcome-notification';
+            notification.innerHTML = `
+                <div style="background: linear-gradient(135deg, #e8f5e8 0%, #f0f8f0 100%); 
+                            border: 2px solid var(--success-color); 
+                            border-radius: 12px; 
+                            padding: 20px; 
+                            margin: 20px; 
+                            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                            position: fixed;
+                            top: 80px;
+                            right: 20px;
+                            z-index: 1001;
+                            max-width: 300px;
+                            animation: slideIn 0.5s ease-out;">
+                    <h3 style="margin: 0 0 10px 0; color: var(--success-color); font-size: 1.1rem;">🎉 Beginner Mode Activated!</h3>
+                    <p style="margin: 0; font-size: 0.9rem; line-height: 1.4;">
+                        We've enhanced the interface to make cooking easier for you. Look for helpful tips and simplified layouts throughout the site!
+                    </p>
+                    <button onclick="this.parentElement.remove()" style="
+                        background: var(--success-color); 
+                        color: white; 
+                        border: none; 
+                        padding: 6px 12px; 
+                        border-radius: 6px; 
+                        margin-top: 10px; 
+                        cursor: pointer;
+                        font-size: 0.8rem;">
+                        Got it!
+                    </button>
+                </div>
+            `;
+            
+            // Add slide-in animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            document.body.appendChild(notification);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Grocery List - TasteVerse</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .grocery-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            overflow: hidden;
+            word-wrap: break-word;
+        }
+        
+        .grocery-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .grocery-title {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--text-dark) !important;
+            margin-bottom: 10px;
+        }
+        
+        .grocery-subtitle {
+            font-size: 18px;
+            color: var(--text-medium) !important;
+            margin-bottom: 30px;
+        }
+        
+        .grocery-stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            text-align: center;
+            min-width: 120px;
+        }
+        
+        .stat-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-color) !important;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-dark) !important;
+        }
+        
+        .grocery-content {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 30px;
+        }
+        
+        .grocery-main {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 30px;
+        }
+        
+        .grocery-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .add-recipe-section {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 20px;
+        }
+        
+        .add-recipe-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--text-dark) !important;
+        }
+        
+        .recipe-search {
+            position: relative;
+            margin-bottom: 15px;
+        }
+        
+        .recipe-search input {
+            width: 100%;
+            padding: 12px 40px 12px 12px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            font-size: 14px;
+            outline: none;
+            transition: var(--transition);
+        }
+        
+        .recipe-search input:focus {
+            border-color: var(--primary-color);
+        }
+        
+        .recipe-search i {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+        }
+        
+        .recipe-suggestions {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            background: white;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            z-index: 10;
+            display: none;
+        }
+        
+        .recipe-suggestion {
+            padding: 12px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+        
+        .recipe-suggestion:hover {
+            background: var(--bg-light);
+        }
+        
+        .recipe-suggestion:last-child {
+            border-bottom: none;
+        }
+        
+        .suggestion-title {
+            font-weight: 500;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+        
+        .suggestion-meta {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+        
+        .grocery-list {
+            margin-bottom: 30px;
+        }
+        
+        .list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .list-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-dark) !important;
+        }
+        
+        .list-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .grocery-items {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .grocery-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: var(--bg-light);
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+        }
+        
+        .grocery-item:hover {
+            background: #f0f0f0;
+        }
+        
+        .grocery-item.checked {
+            opacity: 0.6;
+            text-decoration: line-through;
+        }
+        
+        .item-checkbox {
+            margin-right: 15px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        
+        .item-content {
+            flex: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .item-name {
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+        
+        .item-quantity {
+            font-size: 14px;
+            color: var(--text-light);
+            margin-left: 10px;
+        }
+        
+        .item-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .item-action {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 4px;
+            transition: var(--transition);
+        }
+        
+        .item-action:hover {
+            background: var(--border-color);
+            color: var(--text-dark);
+        }
+        
+        .item-action.delete:hover {
+            color: #e74c3c;
+        }
+        
+        .add-item-section {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .add-item-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .add-item-form input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            font-size: 14px;
+            outline: none;
+            transition: var(--transition);
+        }
+        
+        .add-item-form input:focus {
+            border-color: var(--primary-color);
+        }
+        
+        .add-item-form button {
+            padding: 12px 20px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+        
+        .add-item-form button:hover {
+            background: var(--primary-dark);
+        }
+        
+        .quick-add-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .quick-add-btn {
+            padding: 8px 12px;
+            background: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .quick-add-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        .order-section {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 20px;
+        }
+        
+        .order-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--text-dark) !important;
+        }
+        
+        .order-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .order-option {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .order-option:hover {
+            border-color: var(--primary-color);
+        }
+        
+        .order-option.selected {
+            border-color: var(--primary-color);
+            background: var(--primary-light);
+        }
+        
+        .order-option input[type="radio"] {
+            margin-right: 10px;
+        }
+        
+        .order-option-content {
+            flex: 1;
+        }
+        
+        .order-option-title {
+            font-weight: 500;
+            color: var(--text-dark) !important;
+            margin-bottom: 4px;
+        }
+        
+        .order-option-desc {
+            font-size: 12px;
+            color: var(--text-medium) !important;
+        }
+        
+        .order-actions {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .order-btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .order-btn.primary {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .order-btn.primary:hover {
+            background: var(--primary-dark);
+        }
+        
+        .order-btn.secondary {
+            background: var(--bg-light);
+            color: var(--text-dark);
+            border: 1px solid var(--border-color);
+        }
+        
+        .order-btn.secondary:hover {
+            background: var(--border-color);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-medium) !important;
+        }
+        
+        .empty-state i {
+            font-size: 64px;
+            margin-bottom: 20px;
+            color: var(--border-color);
+        }
+        
+        .empty-state h3 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: var(--text-dark) !important;
+        }
+        
+        .empty-state p {
+            color: var(--text-medium) !important;
+        }
+        
+        .print-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+        
+        .print-modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .print-content {
+            background: white;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .print-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--border-color);
+        }
+        
+        .print-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 10px;
+        }
+        
+        .print-date {
+            color: var(--text-light);
+        }
+        
+        .print-items {
+            margin-bottom: 30px;
+        }
+        
+        .print-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .print-item:last-child {
+            border-bottom: none;
+        }
+        
+        .print-item.checked {
+            text-decoration: line-through;
+            opacity: 0.6;
+        }
+        
+        .print-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        
+        @media (max-width: 768px) {
+            .grocery-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .grocery-stats {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .add-item-form {
+                flex-direction: column;
+            }
+            
+            .list-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-globe"></i>
+                <span>TasteVerse</span>
+            </div>
+            
+            <div class="nav-search">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search recipes, ingredients, or cuisines..." id="searchInput">
+                    <button class="search-btn">
+                        <i class="fas fa-search"></i>
+                        Search
+                    </button>
+                </div>
+            </div>
+            
+            <div class="nav-menu">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="explore.html" class="nav-link">Explore</a>
+                <a href="create-recipe.html" class="nav-link">Create</a>
+                <a href="features.html" class="nav-link">Features</a>
+                <a href="grocery-list.html" class="nav-link active">Grocery</a>
+                <a href="user-profile.html" class="nav-link">Profile</a>
+                <div class="nav-auth">
+                    <button class="btn btn-outline" id="loginBtn">Login</button>
+                    <button class="btn btn-primary" id="signupBtn">Sign Up</button>
+                </div>
+            </div>
+            
+            <div class="nav-toggle">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Grocery List Content -->
+    <div class="grocery-container">
+        <div class="grocery-header">
+            <h1 class="grocery-title">🛍️ Your Smart Grocery List</h1>
+            <p class="grocery-subtitle">Save ingredients from recipes and create your shopping list</p>
+            
+            <div class="grocery-stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalItems">0</div>
+                    <div class="stat-label">Total Items</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="checkedItems">0</div>
+                    <div class="stat-label">Checked Off</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="remainingItems">0</div>
+                    <div class="stat-label">Remaining</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="grocery-content">
+            <div class="grocery-main">
+                <div class="grocery-list">
+                    <div class="list-header">
+                        <h2 class="list-title">Shopping List</h2>
+                        <div class="list-actions">
+                            <button class="btn btn-outline" id="clearCheckedBtn">
+                                <i class="fas fa-check-double"></i> Clear Checked
+                            </button>
+                            <button class="btn btn-outline" id="clearAllBtn">
+                                <i class="fas fa-trash"></i> Clear All
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="grocery-items" id="groceryItems">
+                        <div class="empty-state" id="emptyState">
+                            <i class="fas fa-shopping-cart"></i>
+                            <h3>Your grocery list is empty</h3>
+                            <p>Add items from recipes or manually add ingredients to get started</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="add-item-section">
+                    <h3>Add Items</h3>
+                    <div class="add-item-form">
+                        <input type="text" id="newItemInput" placeholder="Add ingredient (e.g., 2 lbs chicken breast)">
+                        <button id="addItemBtn">
+                            <i class="fas fa-plus"></i> Add
+                        </button>
+                    </div>
+                    <div class="quick-add-buttons">
+                        <button class="quick-add-btn" data-item="Milk">Milk</button>
+                        <button class="quick-add-btn" data-item="Bread">Bread</button>
+                        <button class="quick-add-btn" data-item="Eggs">Eggs</button>
+                        <button class="quick-add-btn" data-item="Butter">Butter</button>
+                        <button class="quick-add-btn" data-item="Onions">Onions</button>
+                        <button class="quick-add-btn" data-item="Garlic">Garlic</button>
+                        <button class="quick-add-btn" data-item="Tomatoes">Tomatoes</button>
+                        <button class="quick-add-btn" data-item="Cheese">Cheese</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="grocery-sidebar">
+                <div class="add-recipe-section">
+                    <h3 class="add-recipe-title">Add from Recipe</h3>
+                    <div class="recipe-search">
+                        <input type="text" id="recipeSearchInput" placeholder="Search recipes...">
+                        <i class="fas fa-search"></i>
+                        <div class="recipe-suggestions" id="recipeSuggestions"></div>
+                    </div>
+                    <p style="font-size: 12px; color: var(--text-light); margin-top: 10px;">
+                        Search and select recipes to automatically add their ingredients to your grocery list
+                    </p>
+                </div>
+                
+                <div class="order-section">
+                    <h3 class="order-title">Order Missing Items</h3>
+                    <div class="order-options">
+                        <label class="order-option">
+                            <input type="radio" name="orderOption" value="instacart">
+                            <div class="order-option-content">
+                                <div class="order-option-title">Instacart</div>
+                                <div class="order-option-desc">Same-day delivery from local stores</div>
+                            </div>
+                        </label>
+                        <label class="order-option">
+                            <input type="radio" name="orderOption" value="amazon">
+                            <div class="order-option-content">
+                                <div class="order-option-title">Amazon Fresh</div>
+                                <div class="order-option-desc">Next-day delivery with Prime</div>
+                            </div>
+                        </label>
+                        <label class="order-option">
+                            <input type="radio" name="orderOption" value="walmart">
+                            <div class="order-option-content">
+                                <div class="order-option-title">Walmart+</div>
+                                <div class="order-option-desc">Free delivery on orders $35+</div>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="order-actions">
+                        <button class="order-btn primary" id="orderBtn">
+                            <i class="fas fa-shopping-cart"></i> Order Missing Items
+                        </button>
+                        <button class="order-btn secondary" id="printBtn">
+                            <i class="fas fa-print"></i> Print List
+                        </button>
+                        <button class="order-btn secondary" id="sendToPhoneBtn">
+                            <i class="fas fa-mobile-alt"></i> Send to Phone
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Print Modal -->
+    <div class="print-modal" id="printModal">
+        <div class="print-content">
+            <div class="print-header">
+                <h2 class="print-title">Shopping List</h2>
+                <div class="print-date" id="printDate"></div>
+            </div>
+            <div class="print-items" id="printItems"></div>
+            <div class="print-actions">
+                <button class="btn btn-primary" onclick="window.print()">
+                    <i class="fas fa-print"></i> Print
+                </button>
+                <button class="btn btn-outline" onclick="closePrintModal()">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Grocery List State
+        let groceryItems = JSON.parse(localStorage.getItem('rh_grocery_list') || '[]');
+        let filteredRecipes = [...mockRecipes];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            setupEventListeners();
+            renderGroceryList();
+            updateStats();
+        });
+
+        function setupEventListeners() {
+            // Add item form
+            document.getElementById('addItemBtn').addEventListener('click', addNewItem);
+            document.getElementById('newItemInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') addNewItem();
+            });
+
+            // Quick add buttons
+            document.querySelectorAll('.quick-add-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const item = this.dataset.item;
+                    addGroceryItem(item, '1 item');
+                });
+            });
+
+            // Recipe search
+            const recipeSearchInput = document.getElementById('recipeSearchInput');
+            recipeSearchInput.addEventListener('input', handleRecipeSearch);
+            recipeSearchInput.addEventListener('focus', showRecipeSuggestions);
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.recipe-search')) {
+                    hideRecipeSuggestions();
+                }
+            });
+
+            // List actions
+            document.getElementById('clearCheckedBtn').addEventListener('click', clearCheckedItems);
+            document.getElementById('clearAllBtn').addEventListener('click', clearAllItems);
+
+            // Order actions
+            document.getElementById('orderBtn').addEventListener('click', orderMissingItems);
+            document.getElementById('printBtn').addEventListener('click', showPrintModal);
+            document.getElementById('sendToPhoneBtn').addEventListener('click', sendToPhone);
+
+            // Search functionality
+            const searchInput = document.getElementById('searchInput');
+            const searchBtn = document.querySelector('.search-btn');
+            
+            searchBtn.addEventListener('click', function() {
+                const query = searchInput.value.trim();
+                if (query) {
+                    window.location.href = `explore.html?q=${encodeURIComponent(query)}`;
+                }
+            });
+            
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchBtn.click();
+                }
+            });
+        }
+
+        function addNewItem() {
+            const input = document.getElementById('newItemInput');
+            const item = input.value.trim();
+            if (item) {
+                addGroceryItem(item, '1 item');
+                input.value = '';
+            }
+        }
+
+        function addGroceryItem(name, quantity = '1 item') {
+            const newItem = {
+                id: Date.now(),
+                name: name,
+                quantity: quantity,
+                checked: false,
+                addedFrom: 'manual'
+            };
+            
+            groceryItems.push(newItem);
+            saveGroceryList();
+            renderGroceryList();
+            updateStats();
+        }
+
+        function addItemsFromRecipe(recipe) {
+            // This would normally parse recipe ingredients
+            // For demo, we'll add some common ingredients
+            const commonIngredients = [
+                '2 lbs chicken breast',
+                '1 lb pasta',
+                '3 tomatoes',
+                'Fresh basil',
+                'Olive oil',
+                'Salt and pepper'
+            ];
+            
+            commonIngredients.forEach(ingredient => {
+                addGroceryItem(ingredient, '1 item');
+            });
+        }
+
+        function toggleItemChecked(itemId) {
+            const item = groceryItems.find(item => item.id === itemId);
+            if (item) {
+                item.checked = !item.checked;
+                saveGroceryList();
+                renderGroceryList();
+                updateStats();
+            }
+        }
+
+        function deleteItem(itemId) {
+            groceryItems = groceryItems.filter(item => item.id !== itemId);
+            saveGroceryList();
+            renderGroceryList();
+            updateStats();
+        }
+
+        function clearCheckedItems() {
+            groceryItems = groceryItems.filter(item => !item.checked);
+            saveGroceryList();
+            renderGroceryList();
+            updateStats();
+        }
+
+        function clearAllItems() {
+            if (confirm('Are you sure you want to clear all items?')) {
+                groceryItems = [];
+                saveGroceryList();
+                renderGroceryList();
+                updateStats();
+            }
+        }
+
+        function renderGroceryList() {
+            const container = document.getElementById('groceryItems');
+            const emptyState = document.getElementById('emptyState');
+            
+            if (groceryItems.length === 0) {
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            
+            container.innerHTML = groceryItems.map(item => `
+                <div class="grocery-item ${item.checked ? 'checked' : ''}">
+                    <input type="checkbox" class="item-checkbox" ${item.checked ? 'checked' : ''} 
+                           onchange="toggleItemChecked(${item.id})">
+                    <div class="item-content">
+                        <div>
+                            <span class="item-name">${item.name}</span>
+                            <span class="item-quantity">${item.quantity}</span>
+                        </div>
+                        <div class="item-actions">
+                            <button class="item-action delete" onclick="deleteItem(${item.id})" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateStats() {
+            const totalItems = groceryItems.length;
+            const checkedItems = groceryItems.filter(item => item.checked).length;
+            const remainingItems = totalItems - checkedItems;
+            
+            document.getElementById('totalItems').textContent = totalItems;
+            document.getElementById('checkedItems').textContent = checkedItems;
+            document.getElementById('remainingItems').textContent = remainingItems;
+        }
+
+        function saveGroceryList() {
+            localStorage.setItem('rh_grocery_list', JSON.stringify(groceryItems));
+        }
+
+        function handleRecipeSearch(e) {
+            const query = e.target.value.toLowerCase();
+            if (query.length < 2) {
+                hideRecipeSuggestions();
+                return;
+            }
+            
+            const suggestions = filteredRecipes.filter(recipe => 
+                recipe.title.toLowerCase().includes(query) ||
+                recipe.description.toLowerCase().includes(query) ||
+                recipe.tags.some(tag => tag.toLowerCase().includes(query))
+            ).slice(0, 5);
+            
+            showRecipeSuggestions(suggestions);
+        }
+
+        function showRecipeSuggestions(suggestions = []) {
+            const container = document.getElementById('recipeSuggestions');
+            
+            if (suggestions.length === 0) {
+                container.style.display = 'none';
+                return;
+            }
+            
+            container.innerHTML = suggestions.map(recipe => `
+                <div class="recipe-suggestion" onclick="selectRecipe(${recipe.id})">
+                    <div class="suggestion-title">${recipe.title}</div>
+                    <div class="suggestion-meta">${recipe.prepTime + recipe.cookTime} min • ${recipe.servings} servings</div>
+                </div>
+            `).join('');
+            
+            container.style.display = 'block';
+        }
+
+        function hideRecipeSuggestions() {
+            document.getElementById('recipeSuggestions').style.display = 'none';
+        }
+
+        function selectRecipe(recipeId) {
+            const recipe = filteredRecipes.find(r => r.id === recipeId);
+            if (recipe) {
+                addItemsFromRecipe(recipe);
+                document.getElementById('recipeSearchInput').value = '';
+                hideRecipeSuggestions();
+            }
+        }
+
+        function orderMissingItems() {
+            const selectedOption = document.querySelector('input[name="orderOption"]:checked');
+            if (!selectedOption) {
+                alert('Please select a delivery service first.');
+                return;
+            }
+            
+            const missingItems = groceryItems.filter(item => !item.checked);
+            if (missingItems.length === 0) {
+                alert('All items are already checked off!');
+                return;
+            }
+            
+            const service = selectedOption.value;
+            const itemList = missingItems.map(item => `• ${item.name} (${item.quantity})`).join('\n');
+            
+            alert(`Redirecting to ${service} to order:\n\n${itemList}\n\nThis would normally open the delivery service with your items pre-loaded.`);
+        }
+
+        function showPrintModal() {
+            const modal = document.getElementById('printModal');
+            const printItems = document.getElementById('printItems');
+            const printDate = document.getElementById('printDate');
+            
+            printDate.textContent = new Date().toLocaleDateString();
+            
+            if (groceryItems.length === 0) {
+                printItems.innerHTML = '<p>No items to print</p>';
+            } else {
+                printItems.innerHTML = groceryItems.map(item => `
+                    <div class="print-item ${item.checked ? 'checked' : ''}">
+                        <span>${item.name}</span>
+                        <span>${item.quantity}</span>
+                    </div>
+                `).join('');
+            }
+            
+            modal.classList.add('active');
+        }
+
+        function closePrintModal() {
+            document.getElementById('printModal').classList.remove('active');
+        }
+
+        function sendToPhone() {
+            const missingItems = groceryItems.filter(item => !item.checked);
+            if (missingItems.length === 0) {
+                alert('All items are already checked off!');
+                return;
+            }
+            
+            const itemList = missingItems.map(item => `• ${item.name} (${item.quantity})`).join('\n');
+            const message = `Shopping List - ${new Date().toLocaleDateString()}\n\n${itemList}`;
+            
+            // This would normally use SMS or email API
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Shopping List',
+                    text: message
+                });
+            } else {
+                // Fallback: copy to clipboard
+                navigator.clipboard.writeText(message).then(() => {
+                    alert('Shopping list copied to clipboard!');
+                });
+            }
+        }
+
+        // Close print modal when clicking outside
+        document.getElementById('printModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closePrintModal();
+            }
+        });
+    </script>
+</body>
+</html>

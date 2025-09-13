@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explore Recipes - TasteVerse</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .explore-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .explore-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .explore-title {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 10px;
+        }
+        
+        .explore-subtitle {
+            font-size: 18px;
+            color: var(--text-light);
+            margin-bottom: 30px;
+        }
+        
+        .search-section {
+            background: white;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 40px;
+            overflow: hidden;
+            word-wrap: break-word;
+        }
+        
+        .search-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--text-dark);
+        }
+        
+        .search-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .search-control {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .search-control label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-dark);
+            margin-bottom: 5px;
+        }
+        
+        .search-control select,
+        .search-control input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            font-size: 14px;
+            outline: none;
+            transition: var(--transition);
+        }
+        
+        .search-control select:focus,
+        .search-control input:focus {
+            border-color: var(--primary-color);
+        }
+        
+        .filter-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .filter-tag {
+            padding: 8px 16px;
+            background: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .filter-tag:hover,
+        .filter-tag.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        .results-section {
+            margin-bottom: 40px;
+        }
+        
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .results-count {
+            font-size: 16px;
+            color: var(--text-light);
+        }
+        
+        .sort-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .sort-control label {
+            font-size: 14px;
+            color: var(--text-dark);
+        }
+        
+        .sort-control select {
+            padding: 8px 12px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            font-size: 14px;
+            outline: none;
+        }
+        
+        .recipe-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-light);
+        }
+        
+        .no-results i {
+            font-size: 64px;
+            margin-bottom: 20px;
+            color: var(--border-color);
+        }
+        
+        .no-results h3 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: var(--text-dark);
+        }
+        
+        @media (max-width: 768px) {
+            .search-controls {
+                flex-direction: column;
+            }
+            
+            .search-control {
+                min-width: 100%;
+            }
+            
+            .results-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+            
+            .recipe-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Feature Page Styling */
+        .explore-hero {
+            background: linear-gradient(135deg, #ff6b35 0%, #f39c12 100%);
+            color: white;
+            padding: 120px 0 80px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .explore-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/><circle cx="10" cy="60" r="0.5" fill="white" opacity="0.1"/><circle cx="90" cy="40" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .floating-elements {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .floating-icon {
+            position: absolute;
+            font-size: 2rem;
+            opacity: 0.1;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .floating-icon:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; }
+        .floating-icon:nth-child(2) { top: 60%; right: 15%; animation-delay: 2s; }
+        .floating-icon:nth-child(3) { bottom: 30%; left: 20%; animation-delay: 4s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-globe"></i>
+                <span>TasteVerse</span>
+            </div>
+            
+            <div class="nav-search">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search recipes, ingredients, or cuisines..." id="searchInput">
+                    <button class="search-btn">
+                        <i class="fas fa-search"></i>
+                        Search
+                    </button>
+                </div>
+            </div>
+            
+            <div class="nav-menu">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="explore.html" class="nav-link active">Explore</a>
+                <a href="create-recipe.html" class="nav-link">Create</a>
+                <a href="features.html" class="nav-link">Features</a>
+                <a href="grocery-list.html" class="nav-link">Grocery</a>
+                <a href="user-profile.html" class="nav-link">Profile</a>
+                <div class="nav-auth">
+                    <button class="btn btn-outline" id="loginBtn">Login</button>
+                    <button class="btn btn-primary" id="signupBtn">Sign Up</button>
+                </div>
+            </div>
+            
+            <div class="nav-toggle">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Explore Hero Section -->
+    <section class="explore-hero">
+        <div class="floating-elements">
+            <i class="fas fa-utensils floating-icon"></i>
+            <i class="fas fa-heart floating-icon"></i>
+            <i class="fas fa-star floating-icon"></i>
+        </div>
+        <div class="container">
+            <h1>Discover Amazing Recipes</h1>
+            <p class="lead">Explore thousands of recipes from around the world and find your next favorite dish</p>
+        </div>
+    </section>
+
+    <!-- Explore Content -->
+    <div class="explore-container">
+        <div class="explore-header">
+            <h1 class="explore-title">Explore Recipes</h1>
+            <p class="explore-subtitle">Discover amazing recipes from around the world</p>
+        </div>
+        
+        <!-- Search Section -->
+        <div class="search-section">
+            <h2 class="search-title">Find Your Perfect Recipe</h2>
+            
+            <div class="search-controls">
+                <div class="search-control">
+                    <label for="categoryFilter">Category</label>
+                    <select id="categoryFilter">
+                        <option value="">All Categories</option>
+                        <option value="italian">Italian</option>
+                        <option value="asian">Asian</option>
+                        <option value="mexican">Mexican</option>
+                        <option value="desserts">Desserts</option>
+                        <option value="healthy">Healthy</option>
+                        <option value="quick">Quick Meals</option>
+                    </select>
+                </div>
+                
+                <div class="search-control">
+                    <label for="difficultyFilter">Difficulty</label>
+                    <select id="difficultyFilter">
+                        <option value="">All Levels</option>
+                        <option value="Easy">Easy</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Hard">Hard</option>
+                    </select>
+                </div>
+                
+                <div class="search-control">
+                    <label for="timeFilter">Max Time</label>
+                    <select id="timeFilter">
+                        <option value="">Any Time</option>
+                        <option value="15">15 minutes</option>
+                        <option value="30">30 minutes</option>
+                        <option value="60">1 hour</option>
+                        <option value="120">2 hours</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="filter-tags">
+                <span class="filter-tag" data-filter="quick">Quick & Easy</span>
+                <span class="filter-tag" data-filter="healthy">Healthy</span>
+                <span class="filter-tag" data-filter="comfort">Comfort Food</span>
+                <span class="filter-tag" data-filter="budget">Budget Friendly</span>
+                <span class="filter-tag" data-filter="family">Family Friendly</span>
+                <span class="filter-tag" data-filter="impress">Impress Guests</span>
+            </div>
+        </div>
+        
+        <!-- Results Section -->
+        <div class="results-section">
+            <div class="results-header">
+                <div class="results-count" id="resultsCount">6 recipes found</div>
+                <div class="sort-control">
+                    <label for="sortBy">Sort by:</label>
+                    <select id="sortBy">
+                        <option value="newest">Newest First</option>
+                        <option value="rating">Highest Rated</option>
+                        <option value="time">Quickest First</option>
+                        <option value="popular">Most Popular</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="recipe-grid" id="recipeGrid">
+                <!-- Recipes will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Explore page specific functionality
+        let filteredRecipes = [...mockRecipes];
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            setupEventListeners();
+            loadRecipes();
+        });
+        
+        function setupEventListeners() {
+            // Search input
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.addEventListener('input', handleSearch);
+            }
+            
+            // Search button
+            const searchBtn = document.querySelector('.search-btn');
+            if (searchBtn) {
+                searchBtn.addEventListener('click', handleSearch);
+            }
+            
+            // Filters
+            const categoryFilter = document.getElementById('categoryFilter');
+            const difficultyFilter = document.getElementById('difficultyFilter');
+            const timeFilter = document.getElementById('timeFilter');
+            const sortBy = document.getElementById('sortBy');
+            
+            if (categoryFilter) categoryFilter.addEventListener('change', applyFilters);
+            if (difficultyFilter) difficultyFilter.addEventListener('change', applyFilters);
+            if (timeFilter) timeFilter.addEventListener('change', applyFilters);
+            if (sortBy) sortBy.addEventListener('change', applyFilters);
+            
+            // Filter tags
+            document.querySelectorAll('.filter-tag').forEach(tag => {
+                tag.addEventListener('click', function() {
+                    this.classList.toggle('active');
+                    applyFilters();
+                });
+            });
+        }
+        
+        function handleSearch(e) {
+            const query = e.target.value.toLowerCase();
+            filteredRecipes = mockRecipes.filter(recipe => 
+                recipe.title.toLowerCase().includes(query) ||
+                recipe.description.toLowerCase().includes(query) ||
+                recipe.tags.some(tag => tag.toLowerCase().includes(query)) ||
+                recipe.author.name.toLowerCase().includes(query)
+            );
+            loadRecipes();
+        }
+        
+        function applyFilters() {
+            const category = document.getElementById('categoryFilter').value;
+            const difficulty = document.getElementById('difficultyFilter').value;
+            const maxTime = document.getElementById('timeFilter').value;
+            const sortBy = document.getElementById('sortBy').value;
+            
+            filteredRecipes = mockRecipes.filter(recipe => {
+                if (category && recipe.category !== category) return false;
+                if (difficulty && recipe.difficulty !== difficulty) return false;
+                if (maxTime && (recipe.prepTime + recipe.cookTime) > parseInt(maxTime)) return false;
+                return true;
+            });
+            
+            // Sort recipes
+            switch (sortBy) {
+                case 'rating':
+                    filteredRecipes.sort((a, b) => b.rating - a.rating);
+                    break;
+                case 'time':
+                    filteredRecipes.sort((a, b) => (a.prepTime + a.cookTime) - (b.prepTime + b.cookTime));
+                    break;
+                case 'popular':
+                    filteredRecipes.sort((a, b) => b.reviewCount - a.reviewCount);
+                    break;
+                case 'newest':
+                default:
+                    filteredRecipes.sort((a, b) => b.id - a.id);
+                    break;
+            }
+            
+            loadRecipes();
+        }
+        
+        function loadRecipes() {
+            const recipeGrid = document.getElementById('recipeGrid');
+            const resultsCount = document.getElementById('resultsCount');
+            
+            if (!recipeGrid) return;
+            
+            // Update results count
+            resultsCount.textContent = `${filteredRecipes.length} recipes found`;
+            
+            if (filteredRecipes.length === 0) {
+                recipeGrid.innerHTML = `
+                    <div class="no-results">
+                        <i class="fas fa-search"></i>
+                        <h3>No recipes found</h3>
+                        <p>Try adjusting your search criteria or filters</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Render recipes
+            recipeGrid.innerHTML = filteredRecipes.map(recipe => `
+                <div class="recipe-card" data-id="${recipe.id}">
+                    <img src="${recipe.image}" alt="${recipe.title}" class="recipe-image">
+                    <div class="recipe-content">
+                        <h3 class="recipe-title">${recipe.title}</h3>
+                        <div class="recipe-meta">
+                            <span><i class="fas fa-clock"></i> ${recipe.prepTime + recipe.cookTime} min</span>
+                            <span><i class="fas fa-users"></i> ${recipe.servings} servings</span>
+                            <span><i class="fas fa-signal"></i> ${recipe.difficulty}</span>
+                        </div>
+                        <p class="recipe-description">${recipe.description}</p>
+                        <div class="recipe-footer">
+                            <div class="recipe-rating">
+                                <div class="stars">
+                                    ${generateStars(recipe.rating)}
+                                </div>
+                                <span>${recipe.rating}</span>
+                            </div>
+                            <div class="recipe-author">
+                                <img src="${recipe.author.avatar}" alt="${recipe.author.name}" class="author-avatar">
+                                <span>${recipe.author.name}</span>
+                            </div>
+                            <button class="action-btn" onclick="toggleFavorite(${recipe.id})">
+                                <i class="far fa-heart"></i>
+                                <span>Save</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function generateStars(rating) {
+            const fullStars = Math.floor(rating);
+            const hasHalfStar = rating % 1 !== 0;
+            let stars = '';
+            
+            for (let i = 0; i < fullStars; i++) {
+                stars += '<i class="fas fa-star"></i>';
+            }
+            
+            if (hasHalfStar) {
+                stars += '<i class="fas fa-star-half-alt"></i>';
+            }
+            
+            const emptyStars = 5 - Math.ceil(rating);
+            for (let i = 0; i < emptyStars; i++) {
+                stars += '<i class="far fa-star"></i>';
+            }
+            
+            return stars;
+        }
+    </script>
+</body>
+</html>
